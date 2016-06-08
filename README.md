@@ -9,7 +9,7 @@ NOTE: This is a temporary location for this project. Intent is to move to https:
 After first checkout, initialize and update submodules:
 
 ```
-# inside root ./reactivesocket-cpp
+# inside root ./reactive-streams-cpp
 git submodule init
 git submodule update --recursive
 ```
@@ -17,7 +17,7 @@ git submodule update --recursive
 # Build & Install
 
 ```
-cd reactive-socket-cpp
+cd reactive-streams-cpp
 mkdir build
 cd build
 cmake ..
