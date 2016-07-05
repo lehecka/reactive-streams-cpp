@@ -1,12 +1,18 @@
+sudo: required
+dist: trusty
+
 language: cpp
 
 os:
   - linux
-  
+
 compiler:
   - gcc
   - clang
 
+before_script:
+  - ./scripts/fetch_folly_ubuntu_trusty.sh
+  - ./scripts/prepare_ubuntu_trusty.sh
 script:
   - mkdir build
   - cd build
