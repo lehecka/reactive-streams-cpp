@@ -1,6 +1,6 @@
 // Copyright 2004-present Facebook. All Rights Reserved.
 
-#include "src/Mocks.h"
+#include "Mocks.h"
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>

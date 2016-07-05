@@ -24,10 +24,10 @@ add_subdirectory(external/googletest EXCLUDE_FROM_ALL)
 
 add_executable(
   tests
-  src/examples/Examples.cpp
-  src/test/AllowanceSemaphoreTest.cpp
-  src/test/OwnershipTest.cpp
-  src/test/SmartPointersTest.cpp
+  test/Examples.cpp
+  test/AllowanceSemaphoreTest.cpp
+  test/OwnershipTest.cpp
+  test/SmartPointersTest.cpp
   )
 
 target_link_libraries(

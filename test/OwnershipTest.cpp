@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "src/utilities/Ownership.h"
+#include "utilities/Ownership.h"
 
 using namespace ::testing;
 using namespace ::reactivestreams;
