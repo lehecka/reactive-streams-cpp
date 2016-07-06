@@ -40,6 +40,7 @@ target_link_libraries(
   )
 
 install (FILES include/ReactiveStreams.h DESTINATION include/reactive-streams)
+install (FILES utilities/AllowanceSemaphore.h utilities/Ownership.h utilities/SmartPointers.h DESTINATION include/reactive-streams/utilities)
 ### TODO why doesn't the following work instead of above?
 #install (TARGETS Reactive-Streams DESTINATION include)
 
