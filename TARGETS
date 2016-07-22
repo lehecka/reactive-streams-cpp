@@ -1,57 +1,74 @@
-cpp_library(
-    name = 'api',
-    headers = [
-        'Publisher.h',
-        'Subscriber.h',
-        'Subscription.h',
-    ],
-    preprocessor_flags = ['-Ilithium',],
+cxx_library(
+    name = 'reactive-streams',
+
+    header_namespace = "reactive-streams",
+    exported_headers = subdir_glob([
+        ("include", "**/*.h"),
+    ]),
+    visibility = ['PUBLIC'],
+)
+
+cxx_library(
+    name = 'reactive-streams-internal',
+    header_namespace = "",
+    exported_headers = subdir_glob([
+        ("include", "**/*.h"),
+    ]),
 )
 
 cpp_library(
-    name = 'mocks',
-    headers = [
-        'Mocks.h',
-    ],
-    deps = [
-        ':api',
-        ':utilities',
-    ],
+    name = 'mocks-dep-internal',
+
     external_deps = [
         ('gmock'),
         ('gtest'),
     ],
-    preprocessor_flags = ['-Ilithium',],
 )
 
-cpp_library(
-    name = 'utilities',
-    headers = [
-        'utilities/AllowanceSemaphore.h',
-        'utilities/Ownership.h',
-        'utilities/SmartPointers.h',
-    ],
-    preprocessor_flags = ['-Ilithium',],
-)
+cxx_library(
+    name = 'reactive-streams-mocks',
 
-cpp_unittest(
-    name = 'examples',
-    headers = glob(['examples/*.h']),
-    srcs = glob(['examples/*.cpp']),
+    header_namespace = "reactive-streams/test",
+    exported_headers = subdir_glob([
+        ("test", "**/Mocks.h"),
+    ]),
+
     deps = [
-        ':mocks',
+        ':reactive-streams-internal',
+        ':reactive-streams-utilities-internal',
+        ':mocks-dep-internal',
     ],
-    preprocessor_flags = ['-Ilithium',],
+    visibility = ['PUBLIC'],
 )
 
-cpp_unittest(
-    name = 'tests',
-    headers = glob(['test/*.h']),
-    srcs = glob(['test/*.cpp']),
-    deps = [
-        ':api',
-        ':mocks',
-        ':utilities',
-    ],
-    preprocessor_flags = ['-Ilithium',],
+cxx_library(
+    name = 'reactive-streams-utilities',
+
+    header_namespace = "reactive-streams/utilities",
+    exported_headers = subdir_glob([
+        ("utilities", "**/*.h"),
+    ]),
+    visibility = ['PUBLIC'],
+)
+
+cxx_library(
+    name = 'reactive-streams-utilities-internal',
+
+    header_namespace = "utilities",
+    exported_headers = subdir_glob([
+        ("utilities", "**/*.h"),
+    ]),
+)
+
+cxx_test(
+   name = 'reactive-streams-tests',
+
+   headers = glob(['test/*.h']),
+   srcs = glob(['test/*.cpp']),
+
+   deps = [
+       ':reactive-streams-internal',
+       ':reactive-streams-utilities-internal',
+       ':mocks-dep-internal',
+   ],
 )
