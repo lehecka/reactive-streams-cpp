@@ -10,15 +10,18 @@ NOTE: This is a temporary location for this project. Intent is to move to https:
 
 # Dependencies
 
-After first checkout, initialize and update submodules:
-
-```
-# inside root ./reactive-streams-cpp
-git submodule init
-git submodule update --recursive
-```
+None.
 
 # Build & Install
+
+A script to build and test is included that installs a Release build in `build/Release/reactivesocket`
+
+```
+$ cd reactive-streams-cpp
+$ bash scripts/cppbuild
+```
+
+or to build by hand and install in a different location
 
 ```
 cd reactive-streams-cpp
