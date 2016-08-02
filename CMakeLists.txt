@@ -69,6 +69,7 @@ reactivestreams_test(smartPoimtersTest test/SmartPointersTest.cpp)
 
 install (FILES include/ReactiveStreams.h DESTINATION include/reactive-streams)
 install (FILES utilities/AllowanceSemaphore.h utilities/Ownership.h utilities/SmartPointers.h DESTINATION include/reactive-streams/utilities)
+install (FILES test/Mocks.h DESTINATION include/reactive-streams/test)
 ### TODO why doesn't the following work instead of above?
 #install (TARGETS Reactive-Streams DESTINATION include)
 
