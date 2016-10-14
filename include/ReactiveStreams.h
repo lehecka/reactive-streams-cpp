@@ -38,7 +38,7 @@ class Publisher {
   /// 2. The Subsciber pointer MUST remain valid until the Publisher calls
   ///   Subscriber::{onComplete,onError}. See "unsubscribe handshake" for more
   ///   details.
-  virtual void subscribe(Subscriber<T, E>& subscriber) = 0;
+  virtual void subscribe(std::shared_ptr<Subscriber<T, E>> subscriber) = 0;
 };
 
 /// Consumes a potentially infinite sequence of elements of type T.
@@ -78,7 +78,7 @@ class Subscriber {
   /// 1. No ownership of the Subscription is assumed by the Subscriber.
   /// 2. The subscription pointer MUST remain valid until the Subscriber calls
   ///   Subscription::cancel. See "unsubscribe handshake" for more details.
-  virtual void onSubscribe(Subscription& subscription) = 0;
+  virtual void onSubscribe(std::shared_ptr<Subscription> subscription) = 0;
 
   /// Called by or on behalf of Publisher when it wishes to deliver the next
   /// element on a subscription.

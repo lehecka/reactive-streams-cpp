@@ -4,9 +4,12 @@
 
 #include <cassert>
 #include <cstddef>
+#include <memory>
 #include <utility>
 
 namespace reactivestreams {
+
+class Subscription;
 
 /// A "smart pointer" to an arbitrary Subscriber.
 ///
@@ -18,8 +21,10 @@ namespace reactivestreams {
 template <typename S>
 class SubscriberPtr {
  public:
+  using SharedPtrT = std::shared_ptr<S>;
+
   SubscriberPtr() = default;
-  explicit SubscriberPtr(S* subscriber) : subscriber_(subscriber) {
+  explicit SubscriberPtr(std::shared_ptr<S> subscriber) : subscriber_(std::move(subscriber)) {
     assert(subscriber_);
   }
 
@@ -36,56 +41,70 @@ class SubscriberPtr {
     reset();
   }
 
-  void reset(S* subscriber = nullptr) {
-    auto* old_subscriber = subscriber_;
-    subscriber_ = subscriber;
-    if (old_subscriber) {
+  void reset(std::shared_ptr<S> subscriber = std::shared_ptr<S>()) {
+    subscriber_.swap(subscriber);
+    if (subscriber) {
       // Tail-call
-      old_subscriber->onComplete();
+      subscriber->onComplete();
     }
   }
 
-  S* release() {
-    auto* subscriber = subscriber_;
-    subscriber_ = nullptr;
-    return subscriber;
+  std::shared_ptr<S> release() {
+    return std::move(subscriber_);
   }
 
-  S* get() const {
-    return subscriber_;
-  }
+//  S* get() const {
+//    return subscriber_.get();
+//  }
 
   explicit operator bool() const {
+    return (bool)subscriber_;
+  }
+
+  operator std::shared_ptr<S>() const {
     return subscriber_;
+  }
+
+  void onSubscribe(std::shared_ptr<Subscription> subscription) const {
+    assert(subscriber_);
+    // calling onSubscribe can result in calling terminating signals (onComplete/onError/cancel)
+    // and releasing shared_ptrs which may destroy object instances while onSubscribe method is still on the stack
+    // we will protect against such bugs by keeping a strong reference to the object while in onSubscribe method
+    auto subscriberCopy = subscriber_;
+    subscriberCopy->onSubscribe(std::move(subscription));
   }
 
   void onNext(typename S::ElementType element) const {
     // Tail-call
     assert(subscriber_);
-    subscriber_->onNext(std::move(element));
+    // calling onNext can result in calling terminating signals (onComplete/onError/cancel)
+    // and releasing shared_ptrs which may destroy object instances while onNext method is still on the stack
+    // we will protect against such bugs by keeping a strong reference to the object while in onNext method
+    auto subscriberCopy = subscriber_;
+    subscriberCopy->onNext(std::move(element));
   }
 
   void onComplete() {
-    if (auto* subscriber = release()) {
+    if (auto subscriber = release()) {
       // Tail-call
       subscriber->onComplete();
     }
   }
 
   void onError(typename S::ErrorType ex) {
-    if (auto* subscriber = release()) {
+    if (auto subscriber = release()) {
       // Tail-call
       subscriber->onError(std::move(ex));
     }
   }
 
  private:
-  S* subscriber_{nullptr};
+  std::shared_ptr<S> subscriber_;
 };
 
 template <typename S>
-SubscriberPtr<S> makeSubscriberPtr(S* subscriber) {
-  return SubscriberPtr<S>(subscriber);
+SubscriberPtr<S> makeSubscriberPtr(std::shared_ptr<S> subscriber) {
+  return SubscriberPtr<S>(std::move(subscriber));
 }
 
 /// A "smart pointer" to an arbitrary Subscription.
@@ -97,8 +116,10 @@ SubscriberPtr<S> makeSubscriberPtr(S* subscriber) {
 template <typename S>
 class SubscriptionPtr {
  public:
+  using SharedPtrT = std::shared_ptr<S>;
+
   SubscriptionPtr() = default;
-  explicit SubscriptionPtr(S* subscription) : subscription_(subscription) {
+  explicit SubscriptionPtr(std::shared_ptr<S> subscription) : subscription_(std::move(subscription)) {
     assert(subscription_);
   }
 
@@ -116,48 +137,53 @@ class SubscriptionPtr {
     reset();
   }
 
-  void reset(S* subscription = nullptr) {
-    auto* old_subscription = subscription_;
-    subscription_ = subscription;
-    if (old_subscription) {
+  void reset(std::shared_ptr<S> subscription = std::shared_ptr<S>()) {
+    subscription_.swap(subscription);
+    if (subscription) {
       // Tail-call
-      old_subscription->cancel();
+      subscription->cancel();
     }
   }
 
-  S* release() {
-    auto* subscription = subscription_;
-    subscription_ = nullptr;
-    return subscription;
+  std::shared_ptr<S> release() {
+    return std::move(subscription_);
   }
 
-  S* get() const {
-    return subscription_;
-  }
+//  S* get() const {
+//    return subscription_.get();
+//  }
 
   explicit operator bool() const {
+    return (bool)subscription_;
+  }
+
+  operator std::shared_ptr<S>() const {
     return subscription_;
   }
 
   void request(size_t n) const {
     // Tail-call
     assert(subscription_);
-    subscription_->request(n);
+    // calling request can result in calling terminating signals (onComplete/onError/cancel)
+    // and releasing shared_ptrs which may destroy object instances while request method is still on the stack
+    // we will protect against such bugs by keeping a strong reference to the object while in request method
+    auto subscriptionCopy = subscription_;
+    subscriptionCopy->request(n);
   }
 
   void cancel() {
-    if (auto* subscription = release()) {
+    if (auto subscription = release()) {
       // Tail-call
       subscription->cancel();
     }
   }
 
  private:
-  S* subscription_{nullptr};
+  std::shared_ptr<S> subscription_;
 };
 
 template <typename S>
-SubscriptionPtr<S> makeSubscriptionPtr(S* subscription) {
-  return SubscriptionPtr<S>(subscription);
+SubscriptionPtr<S> makeSubscriptionPtr(std::shared_ptr<S> subscription) {
+  return SubscriptionPtr<S>(std::move(subscription));
 }
 }
