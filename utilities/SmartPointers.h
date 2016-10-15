@@ -11,11 +11,19 @@ namespace reactivestreams {
 
 class Subscription;
 
-/// A "smart pointer" to an arbitrary Subscriber.
 ///
-/// Accessing a Subscriber via this class only ensures that a terminal signal is
-/// delivered to the pointee exactly once. Note that Subscriber::onSubscriber
-/// must be delivered to the pointee before it is wrapped in SubscriberPtr.
+/// The purpose of the following smart pointer wrappers is this:
+/// 1. It ensures that a terminal signal is delivered
+///    to the pointee exactly once
+/// 2. Releasing the pointer on the terminating signal
+///    will break any circular references.
+/// 3. pointee will stay alive at least as long as the
+///    execution is in the called pointee method. (it will postpone
+///    the destruction of the instance in the case of sending terminating
+///    signal to callee which would release its pointer to the instance.
+///
+
+/// A "smart pointer" to an arbitrary Subscriber.
 ///
 /// This class is not thread-safe. User must provide external synchronisation.
 template <typename S>
@@ -53,10 +61,6 @@ class SubscriberPtr {
     return std::move(subscriber_);
   }
 
-//  S* get() const {
-//    return subscriber_.get();
-//  }
-
   explicit operator bool() const {
     return (bool)subscriber_;
   }
@@ -67,9 +71,12 @@ class SubscriberPtr {
 
   void onSubscribe(std::shared_ptr<Subscription> subscription) const {
     assert(subscriber_);
-    // calling onSubscribe can result in calling terminating signals (onComplete/onError/cancel)
-    // and releasing shared_ptrs which may destroy object instances while onSubscribe method is still on the stack
-    // we will protect against such bugs by keeping a strong reference to the object while in onSubscribe method
+    // calling onSubscribe can result in calling terminating signals
+    // (onComplete/onError/cancel)
+    // and releasing shared_ptrs which may destroy object instances while
+    // onSubscribe method is still on the stack
+    // we will protect against such bugs by keeping a strong reference
+    // to the object while in onSubscribe method
     auto subscriberCopy = subscriber_;
     subscriberCopy->onSubscribe(std::move(subscription));
   }
@@ -77,9 +84,12 @@ class SubscriberPtr {
   void onNext(typename S::ElementType element) const {
     // Tail-call
     assert(subscriber_);
-    // calling onNext can result in calling terminating signals (onComplete/onError/cancel)
-    // and releasing shared_ptrs which may destroy object instances while onNext method is still on the stack
-    // we will protect against such bugs by keeping a strong reference to the object while in onNext method
+    // calling onNext can result in calling terminating signals
+    // (onComplete/onError/cancel)
+    // and releasing shared_ptrs which may destroy object instances while
+    // onNext method is still on the stack
+    // we will protect against such bugs by keeping a strong reference
+     to the object while in onNext method
     auto subscriberCopy = subscriber_;
     subscriberCopy->onNext(std::move(element));
   }
@@ -109,9 +119,6 @@ SubscriberPtr<S> makeSubscriberPtr(std::shared_ptr<S> subscriber) {
 
 /// A "smart pointer" to an arbitrary Subscription.
 ///
-/// Accessing a Subscription via this class only ensures that a terminal signal
-/// is delivered to the pointee exactly once.
-///
 /// This class is not thread-safe. User must provide external synchronisation.
 template <typename S>
 class SubscriptionPtr {
@@ -119,7 +126,8 @@ class SubscriptionPtr {
   using SharedPtrT = std::shared_ptr<S>;
 
   SubscriptionPtr() = default;
-  explicit SubscriptionPtr(std::shared_ptr<S> subscription) : subscription_(std::move(subscription)) {
+  explicit SubscriptionPtr(std::shared_ptr<S> subscription)
+    : subscription_(std::move(subscription)) {
     assert(subscription_);
   }
 
@@ -149,10 +157,6 @@ class SubscriptionPtr {
     return std::move(subscription_);
   }
 
-//  S* get() const {
-//    return subscription_.get();
-//  }
-
   explicit operator bool() const {
     return (bool)subscription_;
   }
@@ -164,9 +168,12 @@ class SubscriptionPtr {
   void request(size_t n) const {
     // Tail-call
     assert(subscription_);
-    // calling request can result in calling terminating signals (onComplete/onError/cancel)
-    // and releasing shared_ptrs which may destroy object instances while request method is still on the stack
-    // we will protect against such bugs by keeping a strong reference to the object while in request method
+    // calling request can result in calling terminating signals
+    // (onComplete/onError/cancel)
+    // and releasing shared_ptrs which may destroy object instances
+    // while request method is still on the stack
+    // we will protect against such bugs by keeping a strong reference
+    // to the object while in request method
     auto subscriptionCopy = subscription_;
     subscriptionCopy->request(n);
   }

@@ -33,11 +33,6 @@ class Publisher {
   /// Must call Subscriber::onSubscribe synchronously to provide a valid
   /// Subscription.
   ///
-  /// Life cycle considerations:
-  /// 1. No ownership of the Subscriber is assumed by the Publisher.
-  /// 2. The Subsciber pointer MUST remain valid until the Publisher calls
-  ///   Subscriber::{onComplete,onError}. See "unsubscribe handshake" for more
-  ///   details.
   virtual void subscribe(std::shared_ptr<Subscriber<T, E>> subscriber) = 0;
 };
 
@@ -58,11 +53,6 @@ class Publisher {
 ///   This holds even if an unsubscribe sequence is initiated by the Subscriber
 ///   calling Subscription::cancel. Therefore, it is perfectly possible for a
 ///   Subscriber to deallocate any resources it holds in ::{onComplete,onError}.
-/// 3. Note that no part of ReactiveStreams specification requires the
-///   Subscriber to be heap-allocated. However, if it is the case, from the
-///   perspective of Publisher-Subscriber interaction, it is valid for the
-///   Subscriber to `delete this;` as the last statement in
-///   ::{onComplete,onError}.
 template <typename T, typename E = std::exception_ptr>
 class Subscriber {
  public:
@@ -125,10 +115,6 @@ class Subscriber {
 ///   is initiated by the Publisher calling Subscriber::{onComplete, onError}.
 ///   Therefore, it is valid for the Subscription to free any resources it holds
 ///   in ::cancel.
-/// 3. Note that no part of ReactiveStreams specification requires the
-///   Subscription to be heap-allocated. However, if it is the case, it is
-///   valid from the perspective of Subscriber-Subscription interaction to
-///   `delete this;` as the last statement in ::cancel.
 ///
 /// Note that it is valid, from the perspective of the ReactiveStreams
 /// specification, for a Subscription and a Publisher to be the same object,
