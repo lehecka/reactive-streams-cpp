@@ -47,9 +47,8 @@ class MockSubscriber : public Subscriber<T, E> {
   void onSubscribe(std::shared_ptr<Subscription> subscription) override {
     subscription_ = subscription;
     // We allow registering the same subscriber with multiple Publishers.
-    // Otherwise, we could get rid of reference counting.
-    onSubscribe_(subscription);
     EXPECT_CALL(checkpoint_, Call());
+    onSubscribe_(subscription);
   }
 
   void onNext(T element) override {
