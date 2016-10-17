@@ -7,7 +7,7 @@
 
 #include <gmock/gmock.h>
 
-#include <reactive-streams/ReactiveStreams.h>
+#include "ReactiveStreams.h"
 
 namespace reactivestreams {
 

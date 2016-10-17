@@ -63,7 +63,7 @@ endfunction()
 # EXCLUDE_FROM_ALL so 'make install' doesn't attempt installation of googletest
 
 reactivestreams_test(examples test/Examples.cpp)
-reactivestreams_test(allowanceSemaphoretest test/AllowanceSemaphoreTest.cpp)
+reactivestreams_test(allowanceSemaphoreTest test/AllowanceSemaphoreTest.cpp)
 reactivestreams_test(smartPointersTest test/SmartPointersTest.cpp)
 
 install (FILES include/ReactiveStreams.h DESTINATION include/reactive-streams)
