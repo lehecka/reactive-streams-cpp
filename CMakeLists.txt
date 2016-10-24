@@ -63,12 +63,11 @@ endfunction()
 # EXCLUDE_FROM_ALL so 'make install' doesn't attempt installation of googletest
 
 reactivestreams_test(examples test/Examples.cpp)
-reactivestreams_test(allowanceSemaphoretest test/AllowanceSemaphoreTest.cpp)
-reactivestreams_test(ownershipTest test/OwnershipTest.cpp)
-reactivestreams_test(smartPoimtersTest test/SmartPointersTest.cpp)
+reactivestreams_test(allowanceSemaphoreTest test/AllowanceSemaphoreTest.cpp)
+reactivestreams_test(smartPointersTest test/SmartPointersTest.cpp)
 
 install (FILES include/ReactiveStreams.h DESTINATION include/reactive-streams)
-install (FILES utilities/AllowanceSemaphore.h utilities/Ownership.h utilities/SmartPointers.h DESTINATION include/reactive-streams/utilities)
+install (FILES utilities/AllowanceSemaphore.h utilities/SmartPointers.h DESTINATION include/reactive-streams/utilities)
 install (FILES test/Mocks.h DESTINATION include/reactive-streams/test)
 ### TODO why doesn't the following work instead of above?
 #install (TARGETS Reactive-Streams DESTINATION include)
