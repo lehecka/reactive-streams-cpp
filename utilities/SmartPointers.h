@@ -89,7 +89,7 @@ class SubscriberPtr {
     // and releasing shared_ptrs which may destroy object instances while
     // onNext method is still on the stack
     // we will protect against such bugs by keeping a strong reference
-     to the object while in onNext method
+    // to the object while in onNext method
     auto subscriberCopy = subscriber_;
     subscriberCopy->onNext(std::move(element));
   }
