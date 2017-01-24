@@ -34,7 +34,7 @@ class Publisher {
   /// Must call Subscriber::onSubscribe synchronously to provide a valid
   /// Subscription.
   ///
-  virtual void subscribe(std::shared_ptr<Subscriber<T, E>> subscriber) = 0;
+  virtual void subscribe(std::shared_ptr<Subscriber<T, E>> subscriber) noexcept = 0;
 };
 
 /// Consumes a potentially infinite sequence of elements of type T.
@@ -69,7 +69,7 @@ class Subscriber {
   /// 1. No ownership of the Subscription is assumed by the Subscriber.
   /// 2. The subscription pointer MUST remain valid until the Subscriber calls
   ///   Subscription::cancel. See "unsubscribe handshake" for more details.
-  virtual void onSubscribe(std::shared_ptr<Subscription> subscription) = 0;
+  virtual void onSubscribe(std::shared_ptr<Subscription> subscription) noexcept = 0;
 
   /// Called by or on behalf of Publisher when it wishes to deliver the next
   /// element on a subscription.
@@ -81,7 +81,7 @@ class Subscriber {
   ///
   /// The method MUST NOT be called after or during an invocation of
   /// ::{onComplete,onError}.
-  virtual void onNext(T element) = 0;
+  virtual void onNext(T element) noexcept = 0;
 
   /// Called by or on behalf of Publisher when it wishes to terminate the
   /// abstract subscription gracefully.
@@ -89,7 +89,7 @@ class Subscriber {
   /// Subscriber pointer passed to the Publisher::subscribe may become invalid
   /// as a result of this call. No other method of the Subscriber can be called
   /// after or during an invocation of ::onComplete.
-  virtual void onComplete() = 0;
+  virtual void onComplete() noexcept = 0;
 
   /// Called by or on behalf of Publisher when it wishes to terminate the
   /// abstract subscription with an error.
@@ -97,7 +97,7 @@ class Subscriber {
   /// Subscriber pointer passed to the Publisher::subscribe may become invalid
   /// as a result of this call. No other method of the Subscriber can be called
   /// after or during an invocation of ::onError.
-  virtual void onError(E ex) = 0;
+  virtual void onError(E ex) noexcept = 0;
 };
 
 /// Represents a connection between Publisher and Subscriber established by an
@@ -149,7 +149,7 @@ class Subscription {
   ///     // ::request of a subscription that feeds this Publisher with data.
   ///   }
   ///
-  virtual void request(size_t n) = 0;
+  virtual void request(size_t n) noexcept = 0;
 
   /// Called by the Subscriber to communicate intention to terminate the
   /// abstract subscription.
@@ -161,6 +161,6 @@ class Subscription {
   /// The Subscriber calling this method will receive
   /// Subscribe::{onComplete,onError} as an acknowledgement that the abstract
   /// subscription has been terminated and no other signal will be sent to it.
-  virtual void cancel() = 0;
+  virtual void cancel() noexcept = 0;
 };
 }

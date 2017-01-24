@@ -14,8 +14,8 @@ TEST(Examples, SelfManagedMocks) {
   int value = 42;
 
   MockPublisher<int> producer;
-  auto subscription = makeMockSubscription();
-  auto subscriber = makeMockSubscriber<int>();
+  auto subscription = std::make_shared<MockSubscription>();
+  auto subscriber = std::make_shared<MockSubscriber<int, std::exception_ptr>>();
   {
     InSequence dummy;
     EXPECT_CALL(producer, subscribe_(_))
